@@ -18,9 +18,10 @@ import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { Loader } from "@/components/loader";
+import { PasswordInput } from "@/components/password-input";
 
 const formSchema = z.object({
-  email: z.string().min(1, { message: "email requires" }),
+  email: z.string().email({ message: "Valid email address required" }),
   password: z.string().min(1, { message: "password required" }),
 });
 
@@ -40,9 +41,9 @@ const SignInPage = () => {
   return (
     <div className="w-screen h-screen flex items-center justify-center px-2 md:px-0 flex-col">
       <div className="bg-gray-100 shadow-lg rounded-xl border">
-        <div className="bg-white w-[400px] shadow-sm px-5 py-6 rounded-xl flex flex-col gap-2  border">
+        <div className="bg-white w-[400px] shadow-sm px-5 py-5 rounded-xl flex flex-col gap-2  border">
           <p className="font-semibold text-xl text-center tracking-tight">
-            Sign in to Cloud IDE
+            Sign in to <span className="bg-gradient-to-r bg-clip-text text-transparent from-slate-800 to-slate-500">Cloud IDE</span>
           </p>
           <p className="text-sm font-medium text-center text-muted-foreground">
             Welcome back! Please sign in to continue
@@ -72,9 +73,9 @@ const SignInPage = () => {
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input placeholder="••••••••" {...field} />
+                      <PasswordInput showPasswordFeature={true} placeholder="••••••••" {...field}/>
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage /> 
                   </FormItem>
                 )}
               />
