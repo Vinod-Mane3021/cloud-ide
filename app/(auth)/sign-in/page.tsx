@@ -1,14 +1,12 @@
 "use client";
 
-import { FaCaretRight, FaGoogle } from "react-icons/fa";
-import { FaGithub } from "react-icons/fa";
+import { FaCaretRight, FaGithub } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { Button } from "@/components/ui/button";
 import React from "react";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -18,8 +16,8 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
+import { Loader } from "@/components/loader";
 
 const formSchema = z.object({
   email: z.string().min(1, { message: "email requires" }),
@@ -35,14 +33,16 @@ const SignInPage = () => {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {};
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    setTimeout(() => {}, 2000);
+  };
 
   return (
     <div className="w-screen h-screen flex items-center justify-center px-2 md:px-0 flex-col">
       <div className="bg-gray-100 shadow-lg rounded-xl border">
-        <div className="bg-white w-[400px] shadow-sm px-5 py-5 rounded-xl flex flex-col gap-2  border">
+        <div className="bg-white w-[400px] shadow-sm px-5 py-6 rounded-xl flex flex-col gap-2  border">
           <p className="font-semibold text-xl text-center tracking-tight">
-            Sign in to SaaS App
+            Sign in to Cloud IDE
           </p>
           <p className="text-sm font-medium text-center text-muted-foreground">
             Welcome back! Please sign in to continue
@@ -78,8 +78,9 @@ const SignInPage = () => {
                   </FormItem>
                 )}
               />
-              <Button type="submit">
+              <Button disabled={false} type="submit" className="mt-5">
                 Continue <FaCaretRight className="size-4 ml-2" />
+                {/* <Loader className="text-white"/> */}
               </Button>
             </form>
 
@@ -104,7 +105,10 @@ const SignInPage = () => {
         <div>
           <p className="text-sm font-medium py-4 text-center text-muted-foreground">
             Don’t have an account?{" "}
-            <Link href="/sign-up" className="hover:underline text-primary cursor-pointer">
+            <Link
+              href="/sign-up"
+              className="hover:underline text-primary cursor-pointer"
+            >
               Sign up
             </Link>
           </p>
