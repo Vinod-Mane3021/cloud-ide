@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { Loader } from "@/components/loader";
 import { PasswordInput } from "@/components/password-input";
+import { signIn } from "next-auth/react";
 
 const formSchema = z.object({
   username: z
@@ -39,6 +40,22 @@ const SignUpPage = () => {
       password: "",
     },
   });
+
+  const signInWithGoogle = async () => {
+    try {
+      await signIn("google");
+    } catch (error) {
+      console.error("Sign in failed", error);
+    }
+  }
+
+  const signInWithGithub = async () => {
+    try {
+      await signIn("github");
+    } catch (error) {
+      console.error("Sign in failed", error);
+    }
+  }
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     setTimeout(() => {}, 2000);
@@ -114,10 +131,10 @@ const SignUpPage = () => {
 
             {/* providers */}
             <div className="w-full flex gap-2 mt-3">
-              <Button variant="outline" className="w-1/2 ">
+              <Button variant="outline" className="w-1/2" onClick={signInWithGoogle}>
                 <FcGoogle className="size-5" />
               </Button>
-              <Button variant="outline" className="w-1/2">
+              <Button variant="outline" className="w-1/2" onClick={signInWithGithub}>
                 <FaGithub className="size-5" />
               </Button>
             </div>
@@ -140,3 +157,6 @@ const SignUpPage = () => {
 };
 
 export default SignUpPage;
+
+
+
