@@ -17,8 +17,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
-import { Loader } from "@/components/loader";
 import { PasswordInput } from "@/components/password-input";
+import { signIn } from "next-auth/react";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Valid email address required" }),
@@ -37,6 +37,22 @@ const SignInPage = () => {
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     setTimeout(() => {}, 2000);
   };
+
+  const signInWithGoogle = async () => {
+    try {
+      await signIn("google");
+    } catch (error) {
+      console.error("Sign in failed", error);
+    }
+  }
+
+  const signInWithGithub = async () => {
+    try {
+      await signIn("github");
+    } catch (error) {
+      console.error("Sign in failed", error);
+    }
+  }
 
   return (
     <div className="w-screen h-screen flex items-center justify-center px-2 md:px-0 flex-col">
@@ -94,10 +110,10 @@ const SignInPage = () => {
 
             {/* providers */}
             <div className="w-full flex gap-2 mt-3">
-              <Button variant="outline" className="w-1/2 ">
+              <Button variant="outline" className="w-1/2" onClick={signInWithGoogle}>
                 <FcGoogle className="size-5" />
               </Button>
-              <Button variant="outline" className="w-1/2">
+              <Button variant="outline" className="w-1/2" onClick={signInWithGithub}>
                 <FaGithub className="size-5" />
               </Button>
             </div>
