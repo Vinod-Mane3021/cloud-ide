@@ -19,6 +19,13 @@ export const authRoutes: string[] = ["/sign-in", "/sign-up"];
 export const apiAuthPrefix: string = "/api/auth";
 
 /**
+ * The prefix for http api route
+ * routes that starts with this prefix are used to make http requests
+ * @type {string}
+ */
+export const apiHttpPrefix: string = "/api/v1"
+
+/**
  * The default redirect path after logging in
  * @type {string}
  */
