@@ -1,12 +1,13 @@
-import { auth, signOut } from "@/auth";
+"use client"
+
 import { Button } from "@/components/ui/button";
+import { signOut, useSession } from "next-auth/react";
 import React from "react";
 
-const DashboardPage = async () => {
-  const session = await auth();
+const DashboardPage = () => {
+  const { data: session_data } = useSession()
 
   const signout = async () => {
-    "use server";
     const signout_res = await signOut({ redirectTo: "/sign-in" });
     console.log({ signout_res });
   };
@@ -14,9 +15,11 @@ const DashboardPage = async () => {
   return (
     <form
       action={signout}
-      className="h-screen flex-col gap-10 w-screen flex items-center justify-center"
+      className=" flex-col gap-10 flex items-center justify-center w-screen"
     >
-      <p className="w-full p-20">session = {JSON.stringify(session)}</p>
+      <br/>
+      <br/>
+      <p className="w-[800px]">{JSON.stringify(session_data)}</p>
       <Button type="submit">sign out </Button>
       <Button>Test Button</Button>
     </form>

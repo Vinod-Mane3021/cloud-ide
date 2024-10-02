@@ -43,7 +43,9 @@ const SignUpPage = () => {
 
   const signInWithGoogle = async () => {
     try {
-      await signIn("google");
+      console.log("signInWithGoogle")
+      const res = await signIn("google");
+      
     } catch (error) {
       console.error("Sign in failed", error);
     }
@@ -51,7 +53,8 @@ const SignUpPage = () => {
 
   const signInWithGithub = async () => {
     try {
-      await signIn("github");
+      const res = await signIn("github");
+      console.log({github: res})
     } catch (error) {
       console.error("Sign in failed", error);
     }
