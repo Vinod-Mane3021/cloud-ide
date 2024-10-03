@@ -24,15 +24,14 @@ export const customZValidator = <
     console.log({ result });
     if (!result.success) {
       const formattedErrors = result.error.errors.map((err) => ({
-        field: err.path[0], // Use the field name from the path
+        // field: err.path[0], // Use the field name from the path
         message: err.message, // Get the error message
       }));
 
       return c.json(
         {
           success: result.success,
-          error: formattedErrors,
-        //   result: result
+          message: "Invalid input provided",
         },
         400
       );
