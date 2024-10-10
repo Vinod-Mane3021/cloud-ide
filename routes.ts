@@ -23,7 +23,7 @@ export const apiAuthPrefix: string = "/api/auth";
  * routes that starts with this prefix are used to make http requests
  * @type {string}
  */
-export const apiHttpPrefix: string = "/api/v1"
+export const apiHttpPrefix: string = "/api"
 
 /**
  * The default redirect path after logging in

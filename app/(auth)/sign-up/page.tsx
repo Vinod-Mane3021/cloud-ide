@@ -45,7 +45,6 @@ const SignUpPage = () => {
     try {
       console.log("signInWithGoogle")
       const res = await signIn("google");
-      
     } catch (error) {
       console.error("Sign in failed", error);
     }
@@ -60,8 +59,9 @@ const SignUpPage = () => {
     }
   }
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    setTimeout(() => {}, 2000);
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    const res = await signIn("credentials", values)
+    console.log({credentials: res})
   };
 
   return (
@@ -86,7 +86,7 @@ const SignUpPage = () => {
                   <FormItem>
                     <FormLabel>Username</FormLabel>
                     <FormControl>
-                      <Input placeholder="john" />
+                      <Input placeholder="john" {...field}/>
                     </FormControl>
                     <FormMessage />
                   </FormItem>

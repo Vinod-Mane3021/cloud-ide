@@ -17,18 +17,18 @@ export default middleware((request) => {
   const isPublicRoute = publicRoutes.includes(pathname);
   const isAuthRoute = authRoutes.includes(pathname);
 
+  console.log({pathname, isHttpApiPrefix})
+
   if (isApiAuthRoute) {
     return;
   }
 
-  if (isHttpApiPrefix) {
-    return;
-  }
+  // if (isHttpApiPrefix) {
+  //   return;
+  // }
 
   if (isLoggedIn && isAuthRoute) {
-    return NextResponse.redirect(
-      new URL(DEFAULT_LOGIN_REDIRECT, request.nextUrl)
-    );
+    return NextResponse.redirect(new URL(DEFAULT_LOGIN_REDIRECT, request.nextUrl));
   }
 
   if (!isLoggedIn && isAuthRoute) {

@@ -3,6 +3,7 @@ import Google from "next-auth/providers/google";
 import Github from "next-auth/providers/github";
 import Credentials from "next-auth/providers/credentials";
 import { NextResponse } from "next/server";
+import { createUser } from "./features/user/api/create-user";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -33,11 +34,21 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   ],
   callbacks: {
     async jwt({ token, account, user }) {
+
       // Initial sign-in
-      if (account && user) {
-        console.log({privider: account.provider})
-        console.log({prividerId: account.providerAccountId})
-        
+      // create user in db
+      if(user && account && user.email && user.name) {
+        const response = await createUser({
+          username: user.name,
+          email: user.email,
+          provider: account.provider,
+          providerId: account.providerAccountId,
+          profileImage: user.image,
+        })
+        console.log({response})
+        if(!response.success) { 
+          return null;
+        }
         token.access_token = account.access_token;
         // token.refresh_token = account.refresh_token;
         // token.access_token_expires_at = account.expires_at ? account.expires_at * 1000 : undefined; // expires_at is in seconds
@@ -54,6 +65,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       // session.refresh_token = token.refresh_token;
       // session.access_token_expires_at = token.access_token_expires_at;
 
+      if(session && session.user && token) {
+        console.log("user auth success")
+      }
+
       return session;
     },
   },
@@ -62,3 +77,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     strategy: "jwt",
   },
 });
+
+
+
+
