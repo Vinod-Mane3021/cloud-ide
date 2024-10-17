@@ -23,9 +23,9 @@ export default middleware((request) => {
     return;
   }
 
-  // if (isHttpApiPrefix) {
-  //   return;
-  // }
+  if (isHttpApiPrefix) {
+    return;
+  }
 
   if (isLoggedIn && isAuthRoute) {
     return NextResponse.redirect(new URL(DEFAULT_LOGIN_REDIRECT, request.nextUrl));

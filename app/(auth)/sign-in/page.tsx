@@ -40,7 +40,8 @@ const SignInPage = () => {
 
   const signInWithGoogle = async () => {
     try {
-      await signIn("google");
+      const data = await signIn("google");
+      console.log({ data })
     } catch (error) {
       console.error("Sign in failed", error);
     }
