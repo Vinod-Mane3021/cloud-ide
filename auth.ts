@@ -45,7 +45,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           providerId: account.providerAccountId,
           profileImage: user.image,
         })
-        console.log({response})
         if(!response.success) { 
           return null;
         }
