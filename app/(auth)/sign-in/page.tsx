@@ -3,7 +3,7 @@
 import { FaCaretRight, FaGithub } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { Button } from "@/components/ui/button";
-import React from "react";
+import React, { useState } from "react";
 import {
   Form,
   FormControl,
@@ -18,49 +18,59 @@ import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { PasswordInput } from "@/components/password-input";
-import { signIn } from "next-auth/react";
+import { AlertMessage } from "@/components/alert-message";
+import { useSignInWithProvider } from "@/features/user/api/use-signin-with-provider";
+import { Loader } from "@/components/loader";
 
 const formSchema = z.object({
-  email: z.string().email({ message: "Valid email address required" }),
-  password: z.string().min(1, { message: "password required" }),
+  identifier: z.string().min(1, { message: "Email or username required" }),
+  password: z.string().min(1, { message: "Password required" }),
 });
 
 const SignInPage = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "",
+      identifier: "",
       password: "",
     },
   });
+  const signInWithProviderMutation = useSignInWithProvider()
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    setTimeout(() => {}, 2000);
+  const data = signInWithProviderMutation.data
+  const isPending = signInWithProviderMutation.isPending
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    signInWithProviderMutation.mutate({
+      provider: "credentials",
+      values
+    })
   };
 
   const signInWithGoogle = async () => {
-    try {
-      const data = await signIn("google");
-      console.log({ data })
-    } catch (error) {
-      console.error("Sign in failed", error);
-    }
-  }
+    signInWithProviderMutation.mutate({
+      provider: "google"
+    })
+  };
 
   const signInWithGithub = async () => {
-    try {
-      await signIn("github");
-    } catch (error) {
-      console.error("Sign in failed", error);
-    }
-  }
+    signInWithProviderMutation.mutate({
+      provider: "github"
+    })
+  };
 
   return (
     <div className="w-screen h-screen flex items-center justify-center px-2 md:px-0 flex-col">
+      <div className="w-[400px] mb-2">
+        {data && data.message && <AlertMessage message={data.message} type="warning" />}
+      </div>
       <div className="bg-gray-100 shadow-lg rounded-xl border">
         <div className="bg-white w-[400px] shadow-sm px-5 py-5 rounded-xl flex flex-col gap-2  border">
           <p className="font-semibold text-xl text-center tracking-tight">
-            Sign in to <span className="bg-gradient-to-r bg-clip-text text-transparent from-slate-800 to-slate-500">Cloud IDE</span>
+            Sign in to{" "}
+            <span className="bg-gradient-to-r bg-clip-text text-transparent from-slate-800 to-slate-500">
+              Cloud IDE
+            </span>
           </p>
           <p className="text-sm font-medium text-center text-muted-foreground">
             Welcome back! Please sign in to continue
@@ -72,12 +82,15 @@ const SignInPage = () => {
             >
               <FormField
                 control={form.control}
-                name="email"
+                name="identifier"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>Email or Username</FormLabel>
                     <FormControl>
-                      <Input placeholder="example@gmail.com" {...field} />
+                      <Input
+                        placeholder="john123@gmail.com or john"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -90,14 +103,19 @@ const SignInPage = () => {
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <PasswordInput showPasswordFeature={true} placeholder="••••••••" {...field}/>
+                      <PasswordInput
+                        showPasswordFeature={true}
+                        placeholder="••••••••"
+                        {...field}
+                      />
                     </FormControl>
-                    <FormMessage /> 
+                    <FormMessage />
                   </FormItem>
                 )}
               />
-              <Button disabled={false} type="submit" className="mt-5">
-                Continue <FaCaretRight className="size-4 ml-2" />
+              <Button disabled={isPending} type="submit" className="mt-5">
+                {isPending && <Loader className="text-white"/>}
+                {!isPending && <><p>Continue</p> <FaCaretRight className="size-4 ml-2" /></>}
                 {/* <Loader className="text-white"/> */}
               </Button>
             </form>
@@ -111,10 +129,20 @@ const SignInPage = () => {
 
             {/* providers */}
             <div className="w-full flex gap-2 mt-3">
-              <Button variant="outline" className="w-1/2" onClick={signInWithGoogle}>
+              <Button
+                disabled={isPending}
+                variant="outline"
+                className="w-1/2"
+                onClick={signInWithGoogle}
+              >
                 <FcGoogle className="size-5" />
               </Button>
-              <Button variant="outline" className="w-1/2" onClick={signInWithGithub}>
+              <Button
+                  disabled={isPending}
+                  variant="outline"
+                  className="w-1/2"
+                  onClick={signInWithGithub}
+              >
                 <FaGithub className="size-5" />
               </Button>
             </div>
@@ -137,3 +165,7 @@ const SignInPage = () => {
 };
 
 export default SignInPage;
+
+
+
+

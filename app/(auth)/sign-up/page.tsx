@@ -19,7 +19,10 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { Loader } from "@/components/loader";
 import { PasswordInput } from "@/components/password-input";
-import { signIn } from "next-auth/react";
+import { useSession } from "next-auth/react";
+import { signInWithProvider } from "@/features/user/services/auth";
+import { useSignInWithProvider } from "@/features/user/api/use-signin-with-provider";
+import { AlertMessage } from "@/components/alert-message";
 
 const formSchema = z.object({
   username: z
@@ -40,34 +43,37 @@ const SignUpPage = () => {
       password: "",
     },
   });
+  const signInWithProviderMutation = useSignInWithProvider()
+
+  const message = signInWithProviderMutation.data?.message
+  const isPending = signInWithProviderMutation.isPending
+
+  const { data: session_data } = useSession()
 
   const signInWithGoogle = async () => {
-    try {
-      console.log("signInWithGoogle")
-      const res = await signIn("google");
-    } catch (error) {
-      console.error("Sign in failed", error);
-    }
-  }
+    signInWithProviderMutation.mutate({
+      provider: "google"
+    })
+  };
 
   const signInWithGithub = async () => {
-    try {
-      const res = await signIn("github");
-      console.log({github: res})
-    } catch (error) {
-      console.error("Sign in failed", error);
-    }
-  }
+    signInWithProviderMutation.mutate({
+      provider: "github"
+    })
+  };
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    const res = await signIn("credentials", values)
-    console.log({credentials: res})
+    
   };
 
   return (
     <div className="w-screen h-screen flex items-center justify-center px-2 md:px-0 flex-col">
+      <div className="w-[400px] mb-2">
+        {message && <AlertMessage message={message} type="warning" />}
+      </div>
       <div className="bg-gray-100 shadow-lg rounded-xl border">
         <div className="bg-white w-[400px] shadow-sm px-5 py-5 rounded-xl flex flex-col gap-2  border">
+          <p className="w-[800px]">{JSON.stringify(session_data)}</p>
           <p className="font-semibold text-xl text-center tracking-tight">
             Create your account
           </p>
@@ -100,7 +106,7 @@ const SignUpPage = () => {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input placeholder="john1234@gmail.com" {...field} />
+                      <Input placeholder="john123@gmail.com" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -119,7 +125,7 @@ const SignUpPage = () => {
                   </FormItem>
                 )}
               />
-              <Button disabled={false} type="submit" className="mt-5">
+              <Button disabled={isPending} type="submit" className="mt-5">
                 Continue <FaCaretRight className="size-4 ml-2" />
                 {/* <Loader className="text-white"/> */}
               </Button>
@@ -134,10 +140,10 @@ const SignUpPage = () => {
 
             {/* providers */}
             <div className="w-full flex gap-2 mt-3">
-              <Button variant="outline" className="w-1/2" onClick={signInWithGoogle}>
+              <Button disabled={isPending} variant="outline" className="w-1/2" onClick={signInWithGoogle}>
                 <FcGoogle className="size-5" />
               </Button>
-              <Button variant="outline" className="w-1/2" onClick={signInWithGithub}>
+              <Button disabled={isPending} variant="outline" className="w-1/2" onClick={signInWithGithub}>
                 <FaGithub className="size-5" />
               </Button>
             </div>

@@ -27,3 +27,20 @@ export const hashPassword = async (
     throw new Error("Error while hashing the password");
   }
 };
+
+/**
+ * Function to verify a password against a hashed password
+ * @param plainPassword - The plain text password entered by the user
+ * @param hashedPassword - The hashed password stored in the database
+ * @returns {Promise<boolean>} - Returns true if the password matches, otherwise false
+ */
+export const verifyPassword = async (
+  plainPassword: string,
+  hashedPassword: string | null
+): Promise<boolean> => {
+  if (hashedPassword) {
+    const isMatch = await bcrypt.compare(plainPassword, hashedPassword);
+    return isMatch;
+  }
+  return false;
+};

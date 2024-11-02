@@ -17,7 +17,12 @@ export default middleware((request) => {
   const isPublicRoute = publicRoutes.includes(pathname);
   const isAuthRoute = authRoutes.includes(pathname);
 
-  console.log({pathname, isHttpApiPrefix})
+  // console.log({pathname, isHttpApiPrefix, isLoggedIn})
+
+  if(pathname.includes("/api/auth/error")) {
+    console.log("----------------------pathname ", pathname)
+    return NextResponse.redirect(new URL("/vinod", request.nextUrl));
+  }
 
   if (isApiAuthRoute) {
     return;
