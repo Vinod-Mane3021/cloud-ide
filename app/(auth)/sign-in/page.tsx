@@ -21,6 +21,8 @@ import { PasswordInput } from "@/components/password-input";
 import { AlertMessage } from "@/components/alert-message";
 import { useSignInWithProvider } from "@/features/user/api/use-signin-with-provider";
 import { Loader } from "@/components/loader";
+import { OauthProviderContainer } from "@/components/auth/oauth-provider-container";
+import { BuiltInProviderType } from "next-auth/providers";
 
 const formSchema = z.object({
   identifier: z.string().min(1, { message: "Email or username required" }),
@@ -47,16 +49,8 @@ const SignInPage = () => {
     })
   };
 
-  const signInWithGoogle = async () => {
-    signInWithProviderMutation.mutate({
-      provider: "google"
-    })
-  };
-
-  const signInWithGithub = async () => {
-    signInWithProviderMutation.mutate({
-      provider: "github"
-    })
+  const signInWithOauthProvider = async (provider: BuiltInProviderType) => {
+    signInWithProviderMutation.mutate({ provider })
   };
 
   return (
@@ -128,24 +122,10 @@ const SignInPage = () => {
             </div>
 
             {/* providers */}
-            <div className="w-full flex gap-2 mt-3">
-              <Button
-                disabled={isPending}
-                variant="outline"
-                className="w-1/2"
-                onClick={signInWithGoogle}
-              >
-                <FcGoogle className="size-5" />
-              </Button>
-              <Button
-                  disabled={isPending}
-                  variant="outline"
-                  className="w-1/2"
-                  onClick={signInWithGithub}
-              >
-                <FaGithub className="size-5" />
-              </Button>
-            </div>
+            <OauthProviderContainer
+              isPending={isPending}
+              onSignIn={signInWithOauthProvider}
+            />
           </Form>
         </div>
         <div>

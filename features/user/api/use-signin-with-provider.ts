@@ -21,6 +21,10 @@ export const useSignInWithProvider = () => {
 
       const res = await signIn(json.provider, properties);
 
+      console.log({
+        res
+      })
+
       const message = json.provider == "credentials" ? res?.code : undefined;
 
       return { message };

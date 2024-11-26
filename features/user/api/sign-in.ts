@@ -1,11 +1,11 @@
 import { HttpStatus, HttpStatusCode } from "@/constants/http-status";
 import { errorMessage } from "@/constants/messages";
 import { ApiResponse } from "@/lib/api-response";
-import { signInType } from "@/schemas/user";
+import { SignInType } from "@/schemas/user";
 import { ApiResponseType } from "@/types/api";
 import axios from "axios";
 
-type RequestType = signInType;
+type RequestType = SignInType;
 type ResponseType = ApiResponseType;
 
 export const signInUser = async (json: RequestType): Promise<ResponseType> => {
@@ -15,11 +15,6 @@ export const signInUser = async (json: RequestType): Promise<ResponseType> => {
       method: "POST",
       body: JSON.stringify(json)
     });
-    // const response = await axios.post(endpoint, json, {
-    //   headers: {
-    //     "Content-Type": "application/json"
-    //   },
-    // });
     
     return await response.json()
   } catch (error) {

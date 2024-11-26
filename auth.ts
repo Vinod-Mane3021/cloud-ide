@@ -3,7 +3,7 @@ import Google from "next-auth/providers/google";
 import Github from "next-auth/providers/github";
 import Credentials from "next-auth/providers/credentials";
 import { NextResponse } from "next/server";
-import { createUser } from "./features/user/api/sign-up";
+import { createUser, signInWithOAuthProvider } from "./features/user/api/sign-up";
 import { signInUser } from "./features/user/api/sign-in";
 import { redirect } from "next/navigation";
 import { toast } from "sonner";
@@ -90,27 +90,34 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (user && account && user.email && user.name) {
         if (account.provider === "credentials") {
           console.log("credentials provider");
+          
         } else {
-          console.log("google or github provider");
+          if(!account.provider) {
+            return null
+          }
+          if(account.provider !== "google" && account.provider !== "github") {
+            console.log({
+              account_pr: account.provider
+            })
+            return null
+          }
+          const response = await signInWithOAuthProvider({
+            username: user.name,
+            email: user.email,
+            profileImage: user.image,
+            provider: account.provider,
+            providerId: account.providerAccountId
+          })
+          console.log({
+            signWithOauthProvider: response,
+            provider: account.provider,
+            providerAccountId: account.providerAccountId,
+            email: user.email
+          })
+          if(!response.success) {
+            return null;
+          }
         }
-
-        // if(account.provider || account.providerAccountId) {
-        //   console.log("provider__0", account.provider)
-        // } else {
-        //   console.log("credentials__0")
-        // }
-
-        // const response = await createUser({
-        //   username: user.name,
-        //   email: user.email,
-        //   provider: account.provider,
-        //   providerId: account.providerAccountId,
-        //   profileImage: user.image,
-        // })
-        // console.log({response_auth_js: response})
-        // if(!response.success) {
-        //   return null;
-        // }
         token.access_token = account.access_token;
         // token.refresh_token = account.refresh_token;
         // token.access_token_expires_at = account.expires_at ? account.expires_at * 1000 : undefined; // expires_at is in seconds

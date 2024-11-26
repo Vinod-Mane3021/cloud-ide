@@ -1,24 +1,49 @@
+import { HttpStatus, HttpStatusCode } from "@/constants/http-status";
+import { errorMessage } from "@/constants/messages";
+import { SignInWithOauthProviderType, SignUpType } from "@/schemas/user";
+import { ApiResponseType } from "@/types/api";
 
-type RequestType = InferRequestType<
-  (typeof hono_client.api.user)["sign-up"]["$post"]
->["json"];
-
-type ResponseType = InferResponseType<
-  (typeof hono_client.api.user)["sign-up"]["$post"]
->;
+type RequestType = SignUpType
+type ResponseType = ApiResponseType
 
 export const createUser = async (json: RequestType): Promise<ResponseType> => {
   try {
-    const response = await fetch("");
-    const data = await response.json();
-    console.log({ createUser: data });
-    return data;
+    const endpoint = `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/sign-up`;
+    const response = await fetch(endpoint, {
+      method: "POST",
+      body: JSON.stringify(json)
+    });
+    
+    return await response.json()
   } catch (error) {
     console.error("Error in creating user ", error);
     return {
       success: false,
-      message:
-        "An unexpected error occurred while processing your request. Please try again later.",
+      message: errorMessage.serverError,
+      status: HttpStatus.SERVER_ERROR,
+      statusCode: HttpStatusCode.INTERNAL_SERVER_ERROR,
+    };
+  }
+};
+
+
+
+export const signInWithOAuthProvider = async (json: SignInWithOauthProviderType): Promise<ResponseType> => {
+  try {
+    const endpoint = "http://localhost:3000/api/auth/sign-in/oauth";
+    const response = await fetch(endpoint, {
+      method: "POST",
+      body: JSON.stringify(json)
+    });
+    
+    return await response.json()
+  } catch (error) {
+    console.error("Error in creating user ", error);
+    return {
+      success: false,
+      message: errorMessage.serverError,
+      status: HttpStatus.SERVER_ERROR,
+      statusCode: HttpStatusCode.INTERNAL_SERVER_ERROR,
     };
   }
 };

@@ -1,7 +1,7 @@
 import { HttpStatus, HttpStatusCode } from "@/constants/http-status";
 import { db } from "@/db/prisma-client";
 import { withApiHandler } from "@/lib/api-handler";
-import { ApiResponse } from "@/lib/api-response";
+import { ApiResponse, ValidationErrorApiResponse } from "@/lib/api-response";
 import { verifyPassword } from "@/lib/utils";
 import { logger } from "@/logger";
 import { signInSchema } from "@/schemas/user";
@@ -12,12 +12,7 @@ export const POST = withApiHandler(async (req: Request) => {
   // Validate the input data against the schema
   const validated = signInSchema.safeParse(jsonData);
   if (!validated.success) {
-    return new ApiResponse({
-      success: false,
-      message: "Please ensure that all required fields are filled in correctly",
-      status: HttpStatus.INVALID_INPUTS,
-      statusCode: HttpStatusCode.BAD_REQUEST,
-    });
+    return new ValidationErrorApiResponse();
   }
 
   const { identifier, password } = validated.data;
@@ -36,6 +31,16 @@ export const POST = withApiHandler(async (req: Request) => {
       message: "No account found with the provided email or username. Please sign up or use a different credential.",
       status: HttpStatus.ACCOUNT_NOT_FOUND,
       statusCode: HttpStatusCode.NOT_FOUND,
+    });
+  }
+
+  // Check if the user is associated with a third-party provider.
+  if (existingUser.provider !== "credentials") {
+    return new ApiResponse({
+      success: false,
+      message: `This account is linked to ${existingUser.provider}. Please sign in using ${existingUser.provider} or create a new account using credentials.`,
+      status: HttpStatus.UNAUTHORIZED,
+      statusCode: HttpStatusCode.UNAUTHORIZED,
     });
   }
 

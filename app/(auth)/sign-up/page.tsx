@@ -23,6 +23,8 @@ import { useSession } from "next-auth/react";
 import { signInWithProvider } from "@/features/user/services/auth";
 import { useSignInWithProvider } from "@/features/user/api/use-signin-with-provider";
 import { AlertMessage } from "@/components/alert-message";
+import { BuiltInProviderType } from "next-auth/providers";
+import { OauthProviderContainer } from "@/components/auth/oauth-provider-container";
 
 const formSchema = z.object({
   username: z
@@ -48,18 +50,8 @@ const SignUpPage = () => {
   const message = signInWithProviderMutation.data?.message
   const isPending = signInWithProviderMutation.isPending
 
-  const { data: session_data } = useSession()
-
-  const signInWithGoogle = async () => {
-    signInWithProviderMutation.mutate({
-      provider: "google"
-    })
-  };
-
-  const signInWithGithub = async () => {
-    signInWithProviderMutation.mutate({
-      provider: "github"
-    })
+  const signInWithOauthProvider = async (provider: BuiltInProviderType) => {
+    signInWithProviderMutation.mutate({ provider })
   };
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
@@ -73,7 +65,6 @@ const SignUpPage = () => {
       </div>
       <div className="bg-gray-100 shadow-lg rounded-xl border">
         <div className="bg-white w-[400px] shadow-sm px-5 py-5 rounded-xl flex flex-col gap-2  border">
-          <p className="w-[800px]">{JSON.stringify(session_data)}</p>
           <p className="font-semibold text-xl text-center tracking-tight">
             Create your account
           </p>
@@ -126,8 +117,8 @@ const SignUpPage = () => {
                 )}
               />
               <Button disabled={isPending} type="submit" className="mt-5">
-                Continue <FaCaretRight className="size-4 ml-2" />
-                {/* <Loader className="text-white"/> */}
+                {isPending && <Loader className="text-white"/>}
+                {!isPending && <><p>Continue</p> <FaCaretRight className="size-4 ml-2" /></>}
               </Button>
             </form>
 
@@ -139,14 +130,11 @@ const SignUpPage = () => {
             </div>
 
             {/* providers */}
-            <div className="w-full flex gap-2 mt-3">
-              <Button disabled={isPending} variant="outline" className="w-1/2" onClick={signInWithGoogle}>
-                <FcGoogle className="size-5" />
-              </Button>
-              <Button disabled={isPending} variant="outline" className="w-1/2" onClick={signInWithGithub}>
-                <FaGithub className="size-5" />
-              </Button>
-            </div>
+            <OauthProviderContainer
+              isPending={isPending}
+              onSignIn={signInWithOauthProvider}
+            />
+            
           </Form>
         </div>
         <div>

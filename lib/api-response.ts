@@ -1,11 +1,13 @@
+import { HttpStatus, HttpStatusCode } from "@/constants/http-status";
 import { ApiResponseType } from "@/types/api";
+import { ZodIssue } from "zod";
 
 /**
  * Custom Response class for standardizing API responses,
  * including success status, HTTP status code, message, and optional data.
  */
 export class ApiResponse extends Response {
-  constructor({ statusCode, status, message, data, success }: ApiResponseType) {
+  constructor({ statusCode, status, message, data, success, errors }: ApiResponseType) {
     super(
       JSON.stringify({
         success,
@@ -13,6 +15,7 @@ export class ApiResponse extends Response {
         status,
         message,
         data,
+        errors
       }),
       {
         status: statusCode,
@@ -21,3 +24,18 @@ export class ApiResponse extends Response {
     );
   }
 }
+
+
+export class ValidationErrorApiResponse extends ApiResponse {
+  constructor(errors?: ZodIssue[]) {
+    super({
+      success: false,
+      message: "Please ensure that all required fields are filled in correctly",
+      status: HttpStatus.INVALID_INPUTS,
+      statusCode: HttpStatusCode.BAD_REQUEST,
+      errors
+    })
+  }
+}
+
+
