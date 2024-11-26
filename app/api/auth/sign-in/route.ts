@@ -38,7 +38,7 @@ export const POST = withApiHandler(async (req: Request) => {
   if (existingUser.provider !== "credentials") {
     return new ApiResponse({
       success: false,
-      message: `This account is linked to ${existingUser.provider}. Please sign in using ${existingUser.provider} or create a new account using credentials.`,
+      message: `This account is linked to ${existingUser.provider}. Please sign in using ${existingUser.provider} or create a new account.`,
       status: HttpStatus.UNAUTHORIZED,
       statusCode: HttpStatusCode.UNAUTHORIZED,
     });
@@ -64,6 +64,12 @@ export const POST = withApiHandler(async (req: Request) => {
     message: "Login successful! Welcome back.",
     status: HttpStatus.SUCCESS,
     statusCode: HttpStatusCode.OK,
+    data: {
+      id: existingUser.id,
+      email: existingUser.email,
+      name: existingUser.username,
+      image: existingUser.profileImage,
+    }
   });
 });
 

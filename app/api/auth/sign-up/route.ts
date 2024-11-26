@@ -8,19 +8,26 @@ import { signUpSchema } from "@/schemas/user";
 export const POST = withApiHandler(async (req: Request) => {
   const jsonData = await req.json();
 
+  console.log({
+    jsonData
+  })
+
   const validated = signUpSchema.safeParse(jsonData);
 
   if (!validated.success) {
     return new ValidationErrorApiResponse();
   }
 
-  const { username, email, password, profileImage } = validated.data;
+  const { username, email, password } = validated.data;
+  console.log({username, email, password})
   const hashedPwd = await hashPassword(password);
 
   // check for existing user
   const existingUser = await db.user.findUnique({
     where: { email },
   });
+
+  console.log({existingUser})
 
   if (existingUser) {
     return new ApiResponse({
@@ -37,10 +44,11 @@ export const POST = withApiHandler(async (req: Request) => {
       username,
       email,
       password: hashedPwd,
-      profileImage,
       provider: "credentials"
     },
   });
+
+  console.log({user})
 
   if (!user) {
     return new ApiResponse({

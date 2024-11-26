@@ -3,8 +3,7 @@ import Google from "next-auth/providers/google";
 import Github from "next-auth/providers/github";
 import Credentials from "next-auth/providers/credentials";
 import { NextResponse } from "next/server";
-import { createUser, signInWithOAuthProvider } from "./features/user/api/sign-up";
-import { signInUser } from "./features/user/api/sign-in";
+import { signInUser, signInWithOAuthProvider } from "./features/user/api/sign-in";
 import { redirect } from "next/navigation";
 import { toast } from "sonner";
 import { CredentialsSignin,  } from "next-auth";
@@ -41,6 +40,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
       async authorize(credentials) {
 
+        console.log({
+          credentials
+        })
+
         if (
           !credentials ||
           !credentials.identifier ||
@@ -49,7 +52,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           typeof credentials.password !== "string"
         ) {
           
-          throw new InvalidLoginError("invali inputs");
+          throw new InvalidLoginError("invalid inputs");
         }
 
         const data = await signInUser({
@@ -57,16 +60,18 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           password: credentials.password,
         });
 
-        if(!data.success) {
-          console.log({"data.message": data.message})
-          throw new InvalidLoginError(data.message);
-        }
-
-        console.log({data})
+        console.log({
+          signInUser: data
+        })
 
         if (!data) {
           throw new Error("Invalid credentials. Please try again.");
           // return null;
+        }
+
+        if(!data.success) {
+          console.log({"data.message": data.message})
+          throw new InvalidLoginError(data.message);
         }
 
         const { data: user } = data
@@ -88,9 +93,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       // Initial sign-in
       // create user in db
       if (user && account && user.email && user.name) {
+
         if (account.provider === "credentials") {
           console.log("credentials provider");
-          
         } else {
           if(!account.provider) {
             return null
@@ -107,12 +112,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             profileImage: user.image,
             provider: account.provider,
             providerId: account.providerAccountId
-          })
-          console.log({
-            signWithOauthProvider: response,
-            provider: account.provider,
-            providerAccountId: account.providerAccountId,
-            email: user.email
           })
           if(!response.success) {
             return null;

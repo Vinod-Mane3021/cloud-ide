@@ -1,7 +1,6 @@
 "use client";
 
-import { FaCaretRight, FaGithub } from "react-icons/fa";
-import { FcGoogle } from "react-icons/fc";
+import { FaCaretRight } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import React from "react";
 import {
@@ -19,22 +18,15 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { Loader } from "@/components/loader";
 import { PasswordInput } from "@/components/password-input";
-import { useSession } from "next-auth/react";
-import { signInWithProvider } from "@/features/user/services/auth";
 import { useSignInWithProvider } from "@/features/user/api/use-signin-with-provider";
 import { AlertMessage } from "@/components/alert-message";
 import { BuiltInProviderType } from "next-auth/providers";
 import { OauthProviderContainer } from "@/components/auth/oauth-provider-container";
+import { useSignUp } from "@/features/user/api/use-signup";
+import { signUpSchema } from "@/schemas/user";
+import { useRouter } from "next/navigation";
 
-const formSchema = z.object({
-  username: z
-    .string()
-    .min(4, { message: "Username must be more that 4 characters" }),
-  email: z.string().email({ message: "Valid email address required" }).min(4),
-  password: z
-    .string()
-    .min(6, { message: "Password must be more that 6 characters" }),
-});
+const formSchema = signUpSchema
 
 const SignUpPage = () => {
   const form = useForm<z.infer<typeof formSchema>>({
@@ -46,16 +38,43 @@ const SignUpPage = () => {
     },
   });
   const signInWithProviderMutation = useSignInWithProvider()
+  const signUpMutation = useSignUp()
 
-  const message = signInWithProviderMutation.data?.message
-  const isPending = signInWithProviderMutation.isPending
+  const message = signUpMutation.data?.message || signUpMutation.data?.errors?.toString() || signInWithProviderMutation.data?.message
+  const isPending = signInWithProviderMutation.isPending || signUpMutation.isPending
+
+  const router = useRouter()
 
   const signInWithOauthProvider = async (provider: BuiltInProviderType) => {
-    signInWithProviderMutation.mutate({ provider })
+    signInWithProviderMutation.mutate({ provider }, {
+      onSuccess: (json) => {
+        console.log({
+          signInWithOauthProvider: json
+        })
+      }
+    })
   };
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    
+
+    const signin = () => {
+      signInWithProviderMutation.mutate({ 
+        provider: "credentials", 
+        values: { 
+          identifier: values.email, 
+          password: values.password 
+        } 
+      },
+      {
+        onSuccess: (json) => {
+          router.push("/dashboard")
+        }
+      })
+    }
+
+    signUpMutation.mutate(values, {
+      onSuccess: () => signin()
+    })
   };
 
   return (
