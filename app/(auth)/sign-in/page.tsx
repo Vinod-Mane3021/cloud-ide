@@ -3,7 +3,7 @@
 import { FaCaretRight, FaGithub } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { Button } from "@/components/ui/button";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Form,
   FormControl,
@@ -39,8 +39,15 @@ const SignInPage = () => {
   });
   const signInWithProviderMutation = useSignInWithProvider()
 
-  const data = signInWithProviderMutation.data
+  const error = signInWithProviderMutation.isError ? signInWithProviderMutation.error?.message : undefined
   const isPending = signInWithProviderMutation.isPending
+
+  useEffect(() => {
+    console.log({
+      is: signInWithProviderMutation.isError,
+      error: signInWithProviderMutation.error?.message,
+    })
+  }, [signInWithProviderMutation.error, signInWithProviderMutation.failureReason, signInWithProviderMutation.isError])
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     signInWithProviderMutation.mutate({
@@ -56,7 +63,7 @@ const SignInPage = () => {
   return (
     <div className="w-screen h-screen flex items-center justify-center px-2 md:px-0 flex-col">
       <div className="w-[400px] mb-2">
-        {data && data.message && <AlertMessage message={data.message} type="warning" />}
+        {error && <AlertMessage message={error} type="warning" />}
       </div>
       <div className="bg-gray-100 shadow-lg rounded-xl border">
         <div className="bg-white w-[400px] shadow-sm px-5 py-5 rounded-xl flex flex-col gap-2  border">

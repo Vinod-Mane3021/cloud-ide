@@ -25,6 +25,7 @@ import { OauthProviderContainer } from "@/components/auth/oauth-provider-contain
 import { useSignUp } from "@/features/user/api/use-signup";
 import { signUpSchema } from "@/schemas/user";
 import { useRouter } from "next/navigation";
+import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
 
 const formSchema = signUpSchema
 
@@ -66,8 +67,8 @@ const SignUpPage = () => {
         } 
       },
       {
-        onSuccess: (json) => {
-          router.push("/dashboard")
+        onSuccess: () => {
+          router.push(DEFAULT_LOGIN_REDIRECT)
         }
       })
     }
