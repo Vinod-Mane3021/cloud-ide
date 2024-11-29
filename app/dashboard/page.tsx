@@ -1,29 +1,55 @@
-"use client"
+// "use client"
 
-import { Button } from "@/components/ui/button";
-import { signOut, useSession } from "next-auth/react";
+import { Terminal } from "@/features/terminal/components/terminal";
+import { useSession } from "next-auth/react";
 import React from "react";
+import jwt, { JwtPayload } from "jsonwebtoken"
+import { Button } from "@/components/ui/button";
+import { auth } from "@/auth";
 
-const DashboardPage = () => {
-  const { data: session_data } = useSession()
 
-  const signout = async () => {
-    const signout_res = await signOut({ redirectTo: "/sign-in" });
-    console.log({ signout_res });
-  };
+const DashboardPage = async () => {
+  // const { data } = useSession()
+  const data = await auth()
 
-  return (
-    <form
-      action={signout}
-      className=" flex-col gap-10 flex items-center justify-center w-screen"
-    >
-      <br/>
-      <br/>
-      <p className="w-[800px]">{JSON.stringify(session_data)}</p>
-      <Button type="submit">sign out </Button>
-      <Button>Test Button</Button>
-    </form>
-  );
+  // console.log({data})
+
+  // const vefiryT = () => {
+  //   const token = data?.access_token as string
+  //   const key = process.env.AUTH_SECRET as string
+
+  //   const is_verify = jwt.verify(token, key)
+
+  //   console.log({
+  //     is_verify
+  //   })
+
+  // }
+
+  return <>
+
+  {/* <p>access_token - {JSON.stringify(data?.access_token)}</p>
+  <br/>
+  <br/>
+  <p>refresh_token - {JSON.stringify(data?.refresh_token)}</p>
+  <br/>
+  <br/>
+  <p>{JSON.stringify(data)}</p>
+  <br/>
+  <br/> */}
+
+<p>access_token - {JSON.stringify(data?.access_token)}</p>
+<br/>
+  <br/>
+  <br/>
+  <br/>
+<p>bearer_token - {JSON.stringify(data?.bearer_token)}</p>
+
+  {/* <Button onClick={vefiryT}>verify</Button> */}
+  {/* <Terminal /> */}
+  </>;
 };
-
 export default DashboardPage;
+
+
+

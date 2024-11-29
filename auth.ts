@@ -7,7 +7,7 @@ import { signInUser, signInWithOAuthProvider } from "./features/user/api/sign-in
 import { redirect } from "next/navigation";
 import { toast } from "sonner";
 import { CredentialsSignin,  } from "next-auth";
-
+import jwt, { JwtPayload } from "jsonwebtoken"
 
 class InvalidLoginError extends CredentialsSignin {
   code: string = "";
@@ -94,6 +94,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       // create user in db
       if (user && account && user.email && user.name) {
 
+        console.log({
+          account
+        })
+
         if (account.provider === "credentials") {
           console.log("credentials provider");
         } else {
@@ -117,21 +121,19 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             return null;
           }
         }
-        token.access_token = account.access_token;
         // token.refresh_token = account.refresh_token;
-        // token.access_token_expires_at = account.expires_at ? account.expires_at * 1000 : undefined; // expires_at is in seconds
+        token.access_token = account.access_token;
+        token.bearer_token = account.id_token;
+        token.access_token_expires_at = account.expires_at ? account.expires_at * 1000 : undefined; // expires_at is in seconds
       }
       return token;
     },
     async session({ session, token }) {
       // Add access_token and refresh_token to session
-
-      // console.log({my_session: session})
-      // console.log({my_token: token})
-
-      session.access_token = token.access_token;
       // session.refresh_token = token.refresh_token;
-      // session.access_token_expires_at = token.access_token_expires_at;
+      session.access_token = token.access_token;
+      session.bearer_token = token.bearer_token;
+      session.access_token_expires_at = token.access_token_expires_at;
 
       return session;
     },
@@ -143,5 +145,4 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   session: {
     strategy: "jwt",
   },
-  
 });
